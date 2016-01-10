@@ -1,7 +1,7 @@
 #ifndef VEC_H
 #define VEC_H
-
 #include <iostream>
+#include <cmath>
 
 struct vec3 {
     union // allows us to refer to members of vec3 in different ways
@@ -86,6 +86,8 @@ vec3 operator *(vec3 v1, vec3 v2);
 vec3 operator /(vec3 v, float k);
 vec3 operator /(vec3 v1, vec3 v2);
 vec3 operator +(vec3 v1, vec3 v2);
+bool operator ==(const vec3 &v1, const vec3 &v2);
+bool operator !=(const vec3 &v1, const vec3 &v2);
 
 vec2 operator *(vec2 v, float k);
 vec2 operator *(float k, vec2 v);
@@ -93,17 +95,35 @@ vec2 operator *(vec2 v1, vec2 v2);
 vec2 operator /(vec2 v, float k);
 vec2 operator /(vec2 v1, vec2 v2);
 vec2 operator +(vec2 v1, vec2 v2);
+bool operator ==(const vec2 &v1, const vec2 &v2);
+bool operator !=(const vec2 &v1, const vec2 &v2);
 
 std::ostream& operator<<(std::ostream &out, const vec3 &toString);
 std::ostream& operator<<(std::ostream &out, const vec2 &toString);
 
-float clamp(float x, float minVal, float maxVal);
-vec2 clamp(vec2 v, vec2 minVal, vec2 maxVal);
 vec3 clamp(vec3 v, vec3 minVal, vec3 maxVal);
-
-float mix(float x, float y, float a);
-vec2 mix(vec2 v1, vec2 v2, vec2 a);
 vec3 mix(vec3 v1, vec3 v2, vec3 a);
+vec3 cross(const vec3 &v1, const vec3 &v2);
+vec3 makeUnitVector(const vec3 &v);
+vec3 minVec(const vec3 &v1, const vec3 &v2);
+vec3 maxVec(const vec3 &v1, const vec3 &v2);
+float length(const vec3 &v);
+float dot(vec3 v);
+float maxComponent(const vec3 &v);
+float minComponent(const vec3 &v);
+float maxComponentAbs(const vec3 &v);
+float minComponentAbs(const vec3 &v);
+int indexOfMinComponent(const vec3 &v);
+int indexOfMaxComponent(const vec3 &v);
+int indexOfMinComponentAbs(const vec3 &v);
+int indexOfMaxComponentAbs(const vec3 &v);
+
+vec2 clamp(vec2 v, vec2 minVal, vec2 maxVal);
+vec2 mix(vec2 v1, vec2 v2, vec2 a);
+vec2 makeUnitVector();
+
+float clamp(float x, float minVal, float maxVal);
+float mix(float x, float y, float a);
 
 typedef vec3 rgb;
 
