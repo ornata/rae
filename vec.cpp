@@ -202,12 +202,26 @@ bool operator !=(const vec2 &v1, const vec2 &v2)
     return !(v1 == v2);
 }
 
-/* ------- Output functions for vectors ------- */
+/* ------- IO functions for vectors ------- */
 
 std::ostream& operator <<(std::ostream &out, const vec3 &toString)
 {
     out << toString.x << " " << toString.y << " " << toString.z;
     return out;
+}
+
+std::istream& operator>>(std::istream &in, vec3 &fromString)
+{
+    float tmp;
+
+    in >> tmp;
+    fromString.x = tmp;
+    in >> tmp;
+    fromString.y = tmp;
+    in >> tmp;
+    fromString.z = tmp;
+
+    return in;
 }
 
 std::ostream& operator <<(std::ostream &out, const vec2 &toString)

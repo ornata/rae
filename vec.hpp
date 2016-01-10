@@ -99,6 +99,7 @@ bool operator ==(const vec2 &v1, const vec2 &v2);
 bool operator !=(const vec2 &v1, const vec2 &v2);
 
 std::ostream& operator<<(std::ostream &out, const vec3 &toString);
+std::istream& operator>>(std::istream &in, vec3 &fromString);
 std::ostream& operator<<(std::ostream &out, const vec2 &toString);
 
 vec3 clamp(vec3 v, vec3 minVal, vec3 maxVal);
