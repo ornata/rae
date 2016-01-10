@@ -353,9 +353,19 @@ vec3 makeUnitVector(vec3 v)
     return v/length(v);
 }
 
-float dot(vec3 v)
+float lengthSquared(vec3 v)
 {
     return v.x * v.x + v.y * v.y + v.z * v.z;
+}
+
+float dot(const vec3 &v1, const vec3 &v2)
+{
+    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+}
+
+float tripleProduct(const vec3 &v1, const vec3 &v2, const vec3 &v3)
+{
+    return dot(cross(v1, v2), v3);
 }
 
 /* ----- other functions ----- */
