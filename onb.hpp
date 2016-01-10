@@ -8,13 +8,7 @@
 
 struct onb
 {
-    union
-    {
-        vec3 e[3];
-        struct {
-            vec3 u, v, w;
-        };
-    };
+    vec3 u, v, w;
 
     onb(const vec3 &v1, const vec3& v2, const vec3 &v3)
     {
