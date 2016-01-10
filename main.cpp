@@ -1,17 +1,12 @@
 #include <iostream>
 #include "vec.hpp"
+#include "onb.hpp"
+#include "dynarray.hpp"
 
 int main(void)
 {
-    rgb r1(2,2,2);
-    rgb r2(3,3,3);
+    rgb r1(1,3,-4);
+    rgb r2(1,1,1);
 
-    std::cout << r1 + r2 << "\n";
-    std::cout << r1 * r2 << "\n";
-    std::cout << r2 / r1 << "\n";
-    std::cout << r1 * 2 << "\n";
-
-    r2 = mix(r2, r1, r1*2);
-
-    std::cout << r2 << "\n";
+    std::cout << indexOfMaxComponentAbs(r1) << "\n";
 }
