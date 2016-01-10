@@ -105,7 +105,7 @@ std::ostream& operator<<(std::ostream &out, const vec2 &toString);
 vec3 clamp(vec3 v, vec3 minVal, vec3 maxVal);
 vec3 mix(vec3 v1, vec3 v2, vec3 a);
 vec3 cross(const vec3 &v1, const vec3 &v2);
-vec3 makeUnitVector(const vec3 &v);
+vec3 makeUnitVector(vec3 v);
 float tripleProduct(const vec3 &v1, const vec3 &v2, const vec3 &v3);
 vec3 minVec(const vec3 &v1, const vec3 &v2);
 vec3 maxVec(const vec3 &v1, const vec3 &v2);
