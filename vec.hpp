@@ -1,5 +1,11 @@
+/*
+* vec.hpp
+* Defines vector2 and vector3 types, as well as rgb types.
+*/
+
 #ifndef VEC_H
 #define VEC_H
+
 #include <iostream>
 #include <cmath>
 

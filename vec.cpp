@@ -1,6 +1,10 @@
+/*
+* vec.cpp
+* Implements the functions for the vec3 and vec2 structs
+* defined in vec.hpp
+*/
+
 #include "vec.hpp"
-#include <iostream>
-#include <cmath>
 
 /* ------- Basic operations on vec3 types ------- */
 
