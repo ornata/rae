@@ -1,5 +1,12 @@
+/*
+* img.hpp
+* Contains the img class, which allows the user to
+* alter/output/update .ppm files.
+*/
+
 #ifndef IMG_H
 #define IMG_H
+
 #include <cmath>
 #include <string>
 #include <fstream>

@@ -1,3 +1,9 @@
+/*
+* ray.hpp
+* Contains the struct and functions for the ray type.
+* That is, a halfline from [0,infinity].
+*/
+
 #ifndef RAY_H
 #define RAY_H
 

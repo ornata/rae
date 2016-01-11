@@ -1,3 +1,8 @@
+/*
+* rng.hpp
+* Defines a simple random number generator.
+*/
+
 #ifndef _RNG_H_
 #define _RNG_H_
 

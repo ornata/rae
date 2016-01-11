@@ -1,3 +1,8 @@
+/*
+* onb.hpp
+* Contains a struct defining a type representing an orthonormal basis.
+*/
+
 #ifndef ONB_H
 #define ONB_H
 

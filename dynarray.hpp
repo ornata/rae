@@ -1,3 +1,9 @@
+/*
+* dynarray.hpp
+* Contains the implementation of a dynamic array type,
+* just in case std::vector<T> is too slow.
+*/
+
 #ifndef DYN_H
 #define DYN_H
 
