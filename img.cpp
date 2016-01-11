@@ -1,5 +1,10 @@
+/*
+* img.cpp
+* Contains implementations of functions from img.hpp.
+* Allows the user to read, output, and alter .ppm images.
+*/
+
 #include "img.hpp"
-#include <iostream>
 
 img::img(int w, int h)
 {

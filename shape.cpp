@@ -1,8 +1,10 @@
-#include <cmath>
-#include <iostream>
+/*
+* shape.cpp
+* Contains implementations of functions for shapes from shape.hpp
+* That includes constructors, hit functions output, etc.
+*/
+
 #include "shape.hpp"
-#include "ray.hpp"
-#include "vec.hpp"
 
 /* ----- triangle ----- */ 
 

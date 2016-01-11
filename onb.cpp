@@ -1,5 +1,9 @@
-#include <iostream>
-#include "vec.hpp"
+/*
+* onb.cpp
+* Contains implementations of the functions for the onb struct
+* defined in onb.hpp.
+*/
+
 #include "onb.hpp"
 
 void onb::setBases(const vec3 &v1, const vec3 &v2, const vec3 &v3)
