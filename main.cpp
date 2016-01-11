@@ -1,20 +1,14 @@
 #include <iostream>
+#include <ctime>
 #include "vec.hpp"
 #include "onb.hpp"
 #include "dynarray.hpp"
+#include "rng.hpp"
 
 int main(void)
 {
-    dynArray<int> d(5);
-    d.append(5);
-    d.append(5);
-    d.append(5);
-    d.append(5);
-    d.append(5);
-    d.append(5);
-    d.append(5);
-    d.append(5);
-    d.append(5);
-    d.truncate();
-    std::cout << d << "\n";
+    rng r;
+    std::cout << r() << "\n";
+    std::cout << r() << "\n";
+    std::cout << r() << "\n";
 }
