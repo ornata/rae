@@ -9,13 +9,13 @@ struct ray
     vec3 origin;
     vec3 direction;
 
-    ray(const vect3 &v1, const vect3 &v2)
+    ray(const vec3 &v1, const vec3 &v2)
     {
         origin = v1;
         direction = v2;
     }
 
-    vect3 pointAtParameter(float t)
+    vec3 pointAtParameter(float t)
     {
         return origin + t * direction;
     }
