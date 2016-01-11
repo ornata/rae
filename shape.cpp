@@ -32,33 +32,34 @@ bool triangle::hit(const ray &r, float tmin, float tmax, float time, hitRecord &
     float K = p0.y - r.origin.y;
     float L = p0.z - r.origin.z;
 
-    float EIHF = E * I - H * F;
-    float GFDI = G * F - D * I;
-    float DHEG = D * H - E * G;
+    float EIHF = E*I - H*F;
+    float GFDI = G*F - D*I;
+    float DHEG = D*H - E*G;
 
-    float denom = (A * EIHF + B * GFDI + C * DHEG);
-    float beta = (J * EIHF + K * GFDI + L * DHEG) / denom;
+    float denom = (A*EIHF + B*GFDI + C*DHEG);
+    float beta = (J*EIHF + K*GFDI + L*DHEG) / denom;
 
     if (beta <= 0.0f || beta >= 1.0f) {
         return false;
     }
 
-    float AKJB = A * K - J * B;
-    float JCAL = J * C - A * L;
-    float BLKC = B * L - K * C;
+    float AKJB = A*K - J*B;
+    float JCAL = J*C - A*L;
+    float BLKC = B*L - K*C;
 
-    float gamma = (I * AKJB + H * JCAL + G * BLKC) / denom;
+    float gamma = (I*AKJB + H*JCAL + G*BLKC) / denom;
 
-    if (gamma <= 0.0f || gamma >= 1.0f) {
+    if (gamma <= 0.0f || beta + gamma >= 1.0f) {
         return false;
     }
 
-    tval = -(F * AKJB + E * JCAL + D * BLKC) / denom;
+    tval = -(F*AKJB + E*JCAL + D*BLKC) / denom;
 
     if (tval >= tmin && tval <= tmax)
     {
         record.t = tval;
         record.normal = makeUnitVector(cross((p1-p0), (p2-p0)));
+        record.colour = colour;
         return true;
     }
      
