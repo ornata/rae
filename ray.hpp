@@ -24,6 +24,7 @@ struct ray
 inline std::ostream &operator <<(std::ostream &out, const ray &toString)
 {
     out << "(" << toString.origin << ") + t(" << toString.direction << ")";
+    return out;
 }
 
 #endif
