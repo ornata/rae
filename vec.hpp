@@ -86,6 +86,7 @@ vec3 operator *(vec3 v1, vec3 v2);
 vec3 operator /(vec3 v, float k);
 vec3 operator /(vec3 v1, vec3 v2);
 vec3 operator +(vec3 v1, vec3 v2);
+vec3 operator -(vec3 v1, vec3 v2);
 bool operator ==(const vec3 &v1, const vec3 &v2);
 bool operator !=(const vec3 &v1, const vec3 &v2);
 
