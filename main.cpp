@@ -5,8 +5,16 @@
 
 int main(void)
 {
-    rgb r1(1,3,-4);
-    rgb r2(1,1,1);
-
-    std::cout << indexOfMaxComponentAbs(r1) << "\n";
+    dynArray<int> d(5);
+    d.append(5);
+    d.append(5);
+    d.append(5);
+    d.append(5);
+    d.append(5);
+    d.append(5);
+    d.append(5);
+    d.append(5);
+    d.append(5);
+    d.truncate();
+    std::cout << d << "\n";
 }
