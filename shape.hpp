@@ -15,9 +15,9 @@
 /* hitRecord: stores information to do with ray-object intersections */
 struct hitRecord
 {
-    float t;
-    vec3 normal;
-    rgb colour;
+    float t;     // param t in r = o + td for a ray r
+    vec3 normal; // normal to the surface defined by the intersection
+    rgb colour;  // colour of the point
 };
 
 /* shape: all shapes will be iterated over and checked for hit and shadowhit */
@@ -30,7 +30,9 @@ struct shape
 /* triangle: defined by three points */
 struct triangle : public shape
 {
-    vec3 p0, p1, p2;
+    vec3 p0; // left point
+    vec3 p1; // top point
+    vec3 p2; // right point
     rgb colour;
 
     triangle(const vec3 &p0_, const vec3 &p1_, const vec3& p2_, const rgb &colour_);
