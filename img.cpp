@@ -62,21 +62,21 @@ void img::gammaCorrect(float g)
 
 void img::writePPM(std::ostream &out)
 {
-    // header
-    out << "P6\n";
-    out << nx << " " << ny << "\n";
-    out << "255\n";
-
     int i, j;
     uint32_t ired, igreen, iblue;
     uint8_t red, green, blue;
+
+    // write header to output
+    out << "P6\n";
+    out << nx << " " << ny << "\n";
+    out << "255\n";
     
     // output clamped to [0, 255]
     for (i = ny-1; i >= 0; i--) {
         for (j = 0; j < nx; j++) {
-            ired = (uint32_t) (256 * raster[i][j].r);
-            igreen = (uint32_t) (256 * raster[i][j].g);
-            iblue = (uint32_t) (256 * raster[i][j].b);
+            ired = (uint32_t) (256 * raster[j][i].r);
+            igreen = (uint32_t) (256 * raster[j][i].g);
+            iblue = (uint32_t) (256 * raster[j][i].b);
 
             if (ired > 255) ired = 255;
             if (igreen > 255) igreen = 255;
@@ -96,18 +96,17 @@ void img::writePPM(std::ostream &out)
 void img::readPPM(std::string fname)
 {
     std::ifstream in;
+    char ch, type;
+    char red, green, blue;
+    int i, j, cols, rows;
+    int num;
+
     in.open(fname.c_str());
 
     if (!in.is_open()) {
         std::cerr << "ERROR: Could not open '" << fname << "'.\n";
         exit(-1);
     }
-
-    char ch, type;
-    char red, green, blue;
-
-    int i, j, cols, rows;
-    int num;
 
     // read header
     in.get(ch);
@@ -118,7 +117,7 @@ void img::readPPM(std::string fname)
     nx = cols;
     ny = rows;
 
-    // allocate raster
+    // allocate raster for ppm
     raster = new rgb*[nx];
 
     for (i = 0; i < nx; i++) {
