@@ -141,10 +141,6 @@ int main(void)
         }        
     }   
 
-    for (auto l : pointLights) {
-        drawLight(*l, image);
-    }
-
     // Output the image to a ppm file
     image.writePPM(std::cout);
 }
