@@ -21,22 +21,68 @@
 #define SMALL_VAL 0.000001f
 #define NUM_SAMPLES 10
 #define BACKGROUND rgb(0.0, 0.0, 0.0)
+#define WHITE rgb(1.0, 1.0, 1.0)
 #define FAR 1000000.0
+#define AMBIENT rgb(0.3, 0.3, 0.3)
+#define MAX_BOUNCE 2
 
-rgb lighting(hitRecord rec, std::vector<shape*> shapes, std::vector<light*> lights)
+void drawLight(pointLight l, img image)
 {
-    hitRecord lightRecord;
+    image.set(l.location.x, l.location.y, WHITE);
+    image.set(l.location.x+1, l.location.y, WHITE);
+    image.set(l.location.x+2, l.location.y, WHITE);
+    image.set(l.location.x-1, l.location.y, WHITE);
+    image.set(l.location.x-2, l.location.y, WHITE);
 
-    // Fire a ray from the point stored in rec to every light
-    // If the object sees a light, then we illuminate it.
-    for (auto l : lights) {
+    image.set(l.location.x, l.location.y+1, WHITE);
+    image.set(l.location.x, l.location.y+2, WHITE);
+    image.set(l.location.x+2, l.location.y-1, WHITE);
+    image.set(l.location.x-1, l.location.y-2, WHITE);
+}
+
+rgb lighting(hitRecord rec, std::vector<shape*> shapes, std::vector<pointLight*> pointLights)
+{
+    float tmax;
+    vec3 p = rec.pointOnSurface;
+    vec3 q;
+    rgb lightContribution(0.0, 0.0, 0.0);
+    int numLights = pointLights.size();
+    bool blocked;
+
+    // Now check if there is any shape in the way of the path from p to q, for all q = a pointLight position
+    for (auto l : pointLights) {
+        q = l->location;
+        tmax = length(p - q);
+        vec3 ptoqDir = makeUnitVector(q - p);
+        ray r(p, ptoqDir);
+
+        if (dot(rec.normal, ptoqDir) < 0) {
+            continue;
+        }
+
+        blocked = false;
+        for (auto s : shapes) {
+            // the shape is shadowed by another shape
+            if (s->shadowHit(r, SMALL_VAL+0.01, tmax, 0)) {
+                blocked = true;
+                break;
+            }
+        }
+
+        if (blocked == false) {
+            lightContribution += l->colour * l->strength;
+        }
     }
 
-    return rec.colour;
+    lightContribution += AMBIENT;
+
+    lightContribution *= rec.colour;
+
+    return lightContribution;
 }
 
 /* Trace a ray to a point and return the colour of that point */
-rgb trace(ray r, std::vector<shape*> shapes, std::vector<light*> lights)
+rgb trace(ray r, std::vector<shape*> shapes, std::vector<pointLight*> pointLights)
 {   
     hitRecord rec;           // Contains information concerning what we hit
     float tmax = FAR;        // The maximum t value of r (maximum distance, really)
@@ -49,9 +95,11 @@ rgb trace(ray r, std::vector<shape*> shapes, std::vector<light*> lights)
         }
     }
 
-    // We've hit an object. rec thus contains how far away it is, and a normal
+    // At this point, tmax contains the distance from the eye to the closest shape.
+    // Now we want to determine whether or not the point at distance tmax should be coloured.
     if (hitShape == true) {
-        return lighting(rec, shapes, lights);
+        rec.pointOnSurface = r.origin + rec.t * r.direction;
+        return lighting(rec, shapes, pointLights);
     }
 
     // We didn't hit anything, so we should return the background colour
@@ -68,12 +116,14 @@ int main(void)
     vec3 dir(0,0,-1);            // Direction of viewing rays
     hitRecord rec;               // Contains information concerning what we hit
     std::vector<shape*> shapes;  // List of shapes in the scene...TODO: make this a faster data structure
-    std::vector<light*> lights;  // List of lights in the scene
+    std::vector<pointLight*> pointLights;  // List of pointLights in the scene
     rgb background(0.0,0.0,0.0); // Background colour
 
     // Popultate shapes to build the scene
-    shapes.push_back(new sphere (vec3(250,250,-1000), 150.0f, rgb(0.7,0.1,0.7)));
-    //shapes.push_back(new plane (vec3(0,0,0), vec3(0,0,1), vec3(1,1,1)));
+    shapes.push_back(new sphere (vec3(250,250,-200), 50.0f, rgb(0.7,0.1,0.7)));
+    shapes.push_back(new sphere (vec3(400,250,-200), 100.0f, rgb(0.9,0.1,0.7)));
+    pointLights.push_back(new pointLight(vec3(200,300,-200), 1.0f));
+    shapes.push_back(new plane (vec3(0,0.5,-100), vec3(0,0.5,0.5), vec3(1,1,1)));
 
     // Iterate over every pixel, firing off rays at objects
     for (int i = 0; i < WIDTH; i++) {
@@ -84,12 +134,16 @@ int main(void)
             // Generate randomly sampled rays
             for (int k = 0; k < NUM_SAMPLES; k++) {
                 ray r(vec3(drand48() + i - 0.5f, drand48() + j - 0.5f, 0), dir);
-                avgColour += trace(r, shapes);
+                avgColour += trace(r, shapes, pointLights);
             }
 
             image.set(i, j, avgColour/NUM_SAMPLES);
         }        
     }   
+
+    for (auto l : pointLights) {
+        drawLight(*l, image);
+    }
 
     // Output the image to a ppm file
     image.writePPM(std::cout);
