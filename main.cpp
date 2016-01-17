@@ -26,20 +26,6 @@
 #define AMBIENT rgb(0.3, 0.3, 0.3)
 #define MAX_BOUNCE 2
 
-void drawLight(pointLight l, img image)
-{
-    image.set(l.location.x, l.location.y, WHITE);
-    image.set(l.location.x+1, l.location.y, WHITE);
-    image.set(l.location.x+2, l.location.y, WHITE);
-    image.set(l.location.x-1, l.location.y, WHITE);
-    image.set(l.location.x-2, l.location.y, WHITE);
-
-    image.set(l.location.x, l.location.y+1, WHITE);
-    image.set(l.location.x, l.location.y+2, WHITE);
-    image.set(l.location.x+2, l.location.y-1, WHITE);
-    image.set(l.location.x-1, l.location.y-2, WHITE);
-}
-
 rgb lighting(hitRecord rec, std::vector<shape*> shapes, std::vector<pointLight*> pointLights)
 {
     float tmax;
