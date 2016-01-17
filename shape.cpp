@@ -5,7 +5,7 @@
 */
 
 #include "shape.hpp"
-
+#define COLLISION_EPS 0.0001f
 /* ----- triangle ----- */ 
 
 triangle::triangle(const vec3 &p0_, const vec3 &p1_, const vec3& p2_, const rgb &colour_) :
@@ -155,22 +155,24 @@ centre(centre_), radius(radius_), colour(colour_)
 /* Check if r intersects with the given sphere. Return true if it does, false otherwise */
 bool sphere::hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const
 {
-    vec3 tmp = r.origin - centre; // get vector from origin of ray to centre of sphere
+    vec3 tmp = r.origin - centre; 
 
     double a = dot(r.direction, r.direction);
-    double b = 2 * dot(r.direction, tmp);
+    double b = dot(r.direction, tmp) * 2;
     double c = dot(tmp, tmp) - radius*radius;
     double discriminant = b*b - 4*a*c; // how many real solns?
 
     // does the ray intersect the sphere?
     if (discriminant > 0) {
         discriminant = sqrt(discriminant);
-        double t = (-b - discriminant) / (a+a);
+        double t = (-b - discriminant) / (2*a);
 
+        // check for valid interval
         if (t < tmin) {
-            t = (-b + discriminant) / (a+a);
+            t = (-b + discriminant) / (2*a);
         }
 
+        // too far or too close
         if (t < tmin || t > tmax) {
             return false;
         }
@@ -221,4 +223,50 @@ std::ostream &operator <<(std::ostream &out, const sphere &toString)
 {
     out << "( c = " << toString.centre << ", r = " << toString.radius << ", colour = " << toString.colour << ")";
     return out;
+}
+
+/* ----- plane ----- */
+
+plane::plane(const vec3 &pt_, const vec3 &n_, const vec3 &colour_) :
+pt(pt_), n(makeUnitVector(n_)), colour(colour_)
+{}
+
+/* Check if r intersects with the plane */
+bool plane::hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const
+{
+
+    float denom = dot(n, r.direction);
+
+    if (fabs(denom - COLLISION_EPS) < COLLISION_EPS) {
+        return false;
+    }
+
+    float t = dot(n, vec3(pt - r.origin)) / denom;
+
+    if (t < tmin || t > tmax) { // bounds check
+        return false;
+    }
+
+    record.t = t;
+    record.normal = n;
+    record.colour = colour;
+
+    return true;                                                                                                                                                                                                                      
+
+}
+
+bool plane::shadowHit(const ray &r, float tmin, float tmax, float time) const
+{
+    float denom = dot(n, r.direction);
+    if (denom - COLLISION_EPS < COLLISION_EPS) {
+        return false;
+    }
+
+    float t = dot(n, vec3(pt - r.origin)) / denom;
+
+    if (t < tmin || t > tmax) { // bounds check
+        return false;
+    }
+    
+    return true;  
 }

@@ -17,6 +17,7 @@ struct hitRecord
 {
     float t;     // param t in r = o + td for a ray r
     vec3 normal; // normal to the surface defined by the intersection
+    vec3 pointOnSurface;
     rgb colour;  // colour of the point
 };
 
@@ -43,16 +44,29 @@ struct triangle : public shape
 /* sphere: defined by a centre and a radius */
 struct sphere : shape
 {
-    vec3 centre;
-    float radius;
-    rgb colour; 
+    vec3 centre; // centre of sphere
+    float radius; // radius of sphere
+    rgb colour;  // colour of sphere
 
     sphere(const vec3 &centre_, float radius_, const rgb &colour_);
     bool hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const;
     bool shadowHit(const ray &r, float tmin, float tmax, float time) const;
 };
 
+/* plane: defined by a point + a normal */
+struct plane : shape
+{
+    vec3 pt; // point on the plane
+    vec3 n;  // vector normal to the plane
+    rgb colour; // colour of plane
+
+    plane(const vec3 &pt_, const vec3 &n_, const vec3 &colour_);
+    bool hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const;
+    bool shadowHit(const ray &r, float tmin, float tmax, float time) const;
+};
+
 std::ostream &operator <<(std::ostream &out, const triangle &toString);
 std::ostream &operator <<(std::ostream &out, const sphere &toString);
+std::ostream &operator <<(std::ostream &out, const plane &toString);
 
 #endif
