@@ -10,6 +10,10 @@
 #include <cmath>
 #include <iostream>
 #include <cstdint>
+#include <fstream>
+#include <cstdlib>
+#include <cstdio>
+#include <string>
 #include "ray.hpp"
 #include "vec.hpp"
 
@@ -69,7 +73,8 @@ struct triangleMesh : public shape
     meshVertex* vertexArray;      // contains every vertex in the mesh
     meshTriangle* triangleArray;  // contains every triangle in the mesh
 
-    triangleMesh(std::istream meshFile);
+    triangleMesh(std::string fname);
+    ~triangleMesh();
     virtual bool hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const=0;
     virtual bool shadowHit(const ray &r, float tmin, float tmax, float time) const=0;
 };

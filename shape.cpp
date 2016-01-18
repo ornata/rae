@@ -27,8 +27,6 @@ p0(p0_), p1(p1_), p2(p2_), colour(colour_)
 *   tmin: Minimum parameterization of r (the closest you can be to the camera)
 *   tmax: Maximum parameterization of r (the farthest you can be from the camera)
 *   record: Stores information to do with the intersection of r and this triangle, if it occurs
-*
-*  TODO better triangle intersection algo!
 */
 bool triangle::hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const
 {
@@ -144,6 +142,67 @@ std::ostream &operator <<(std::ostream &out, const triangle &toString)
 {
     out << "([" << toString.p0 << "], [" << toString.p1 << "], [" << toString.p2 << "], colour: [" << toString.colour << "])";
     return out;
+}
+
+/* ----- triangleMesh ---- */
+
+/*
+* Read in a mesh file and initialize a triangleMesh using it.
+* 1st 4B of file: # vertices
+* 2nd 4B of file: # triangles
+* Next # vertices * sizeof(meshVertex) B: vertex data
+* Next # triangles * sizeof(meshTriangle) B: triangle data
+*/
+triangleMesh::triangleMesh(std::string fname)
+{
+    FILE* meshFile = fopen(fname.c_str(), "rb");
+    if (!meshFile) {
+        std::cerr << "Could not open '" << fname << "'.\n";
+        exit(-1);
+    }
+
+    // Read in the number of vertices and then the number of triangles
+    if (fread(&nv, 4, 1, meshFile) < 1) {
+        std::cerr << "ERROR: Could not load mesh file. \n";
+        exit(-1);
+    }
+
+    if (fread(&nt, 4, 1, meshFile) < 1) {
+        std::cerr << "ERROR: Could not load mesh file. \n";
+        exit(-1);
+    }
+
+    // Allocate memory for the vertex and triangle arrays
+    vertexArray = (meshVertex*) malloc(nv * sizeof(meshVertex));
+    if (!vertexArray) {
+        std::cerr << "ERROR: Could not allocate memory for vertexArray. (number of vertices = " << nv << ")\n";
+        exit(-1);
+    }
+
+    triangleArray = (meshTriangle*) malloc(nt * sizeof(meshTriangle));
+    if (!triangleArray) {
+        std::cerr << "ERROR: Could not allocate memory for triangleArray. (number of triangles = " << nt << ")\n";
+        exit(-1);
+    }
+
+    // Read in the vertexArray and the triangleArrays
+    if (fread(vertexArray, sizeof(float), nv * 8, meshFile) < (nv * 8)) {
+        std::cerr << "ERROR: Could not load mesh file. \n";
+        exit(-1);
+    }
+
+    if (fread(triangleArray, sizeof(int), nt * 3, meshFile) < (nt * 3)) {
+        std::cerr << "ERROR: Could not load mesh file. \n";
+        exit(-1);
+    }
+
+    fclose(meshFile);
+}
+
+triangleMesh::~triangleMesh()
+{
+    free(vertexArray);
+    free(triangleArray);
 }
 
 /* ----- sphere ----- */ 
