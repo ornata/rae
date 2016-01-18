@@ -205,6 +205,16 @@ triangleMesh::~triangleMesh()
     free(triangleArray);
 }
 
+bool triangleMesh::hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const
+{
+    return false;
+}
+
+bool triangleMesh::shadowHit(const ray &r, float tmin, float tmax, float time) const
+{
+    return false;
+}
+
 /* ----- sphere ----- */ 
 
 sphere::sphere(const vec3 &centre_, float radius_, const rgb &colour_) :
