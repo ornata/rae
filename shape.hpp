@@ -72,11 +72,15 @@ struct triangleMesh : public shape
     uint32_t nt;                  // number of triangles
     meshVertex* vertexArray;      // contains every vertex in the mesh
     meshTriangle* triangleArray;  // contains every triangle in the mesh
+    rgb colour;
 
-    triangleMesh(std::string fname);
+    triangleMesh(std::string fname, const rgb &colour_);
     ~triangleMesh();
+
+    bool hitMeshTriangle(const ray &r, float tmin, float tmax, float time, int tidx, hitRecord* record) const;
     bool hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const;
     bool shadowHit(const ray &r, float tmin, float tmax, float time) const;
+
 };
 
 /* sphere: defined by a centre and a radius */
@@ -106,5 +110,8 @@ struct plane : shape
 std::ostream &operator <<(std::ostream &out, const triangle &toString);
 std::ostream &operator <<(std::ostream &out, const sphere &toString);
 std::ostream &operator <<(std::ostream &out, const plane &toString);
+std::ostream &operator <<(std::ostream &out, const triangleMesh &tm);
+std::ostream &operator <<(std::ostream &out, const meshTriangle &t);
+std::ostream &operator <<(std::ostream &out, const meshVertex &v);
 
 #endif

@@ -19,9 +19,12 @@ p0(p0_), p1(p1_), p2(p2_), colour(colour_)
 * Check if r = origin + t * direction intersects with this triangle.
 * Return true if it does, false otherwise
 *
-* Uses barycentric coordinates to define a plane. That is, we define a plane as
+* Uses barycentric coordinates to define a plane. That is, we define a triangle as
 * p(alpha, beta, gamma) = alpha*a + beta*b + gamma*c
 * where alpha + beta + gamma = 1
+*
+* This basically says that alpah, beta, and gamma say "how close" we are to one of
+* the points on the triangle.
 *
 * PARAMETERS:
 *   tmin: Minimum parameterization of r (the closest you can be to the camera)
@@ -153,7 +156,8 @@ std::ostream &operator <<(std::ostream &out, const triangle &toString)
 * Next # vertices * sizeof(meshVertex) B: vertex data
 * Next # triangles * sizeof(meshTriangle) B: triangle data
 */
-triangleMesh::triangleMesh(std::string fname)
+triangleMesh::triangleMesh(std::string fname, const rgb &colour_) :
+colour(colour_)
 {
     FILE* meshFile = fopen(fname.c_str(), "rb");
     if (!meshFile) {
@@ -205,14 +209,133 @@ triangleMesh::~triangleMesh()
     free(triangleArray);
 }
 
+bool triangleMesh::hitMeshTriangle(const ray &r, float tmin, float tmax, float time, int tidx, hitRecord* record) const
+{
+    meshTriangle tri = triangleArray[tidx]; // get the current mesh triangle
+
+    /* Coordinates for the triangle */
+    vec3 p0 = vertexArray[tri.i0].coords;
+    vec3 p1 = vertexArray[tri.i1].coords;
+    vec3 p2 = vertexArray[tri.i2].coords;
+
+    /* Normals for the triangle */
+    vec3 n0 = vertexArray[tri.i0].normal;
+    vec3 n1 = vertexArray[tri.i1].normal;
+    vec3 n2 = vertexArray[tri.i2].normal;
+
+    float tval; // parameter for the intersection with the triangle
+
+    // edge from p1 -> p0
+    float A = p0.x - p1.x;
+    float B = p0.y - p1.y;
+    float C = p0.z - p1.z; 
+
+    // edge from p2 -> p0
+    float D = p0.x - p2.x; 
+    float E = p0.y - p2.y;
+    float F = p0.z - p2.z;
+
+    // components of ray
+    float G = r.direction.x;
+    float H = r.direction.y;
+    float I = r.direction.z;
+
+    // edge from ray to p0 (lower left point on triangle)
+    float J = p0.x - r.origin.x;
+    float K = p0.y - r.origin.y;
+    float L = p0.z - r.origin.z;
+
+    // precompute differences for computing beta, gamma, and t by Cramer's rule
+    float EIHF = E*I - H*F;
+    float GFDI = G*F - D*I;
+    float DHEG = D*H - E*G;
+    float denom = A*EIHF + B*GFDI + C*DHEG;
+
+    float beta = (J*EIHF + K*GFDI + L*DHEG) / denom;
+
+    // failed constraint 0 < beta < 1
+    if (beta <= 0.0f || beta >= 1.0f) {
+        return false;
+    }
+
+    float AKJB = A*K - J*B;
+    float JCAL = J*C - A*L;
+    float BLKC = B*L - K*C;
+
+    float gamma = (I*AKJB + H*JCAL + G*BLKC) / denom;
+
+    // failed constraint 0 < beta + gamma < 1
+    // get this by plugging in alpha = 1 - beta - gamma into 
+    // p(alpha,beta,gamma) = A*alpha + B*beta + C*gamma
+    if (gamma <= 0.0f || beta + gamma >= 1.0f) {
+        return false;
+    }
+
+    tval = -(F*AKJB + E*JCAL + D*BLKC) / denom; // dist of intersection
+
+    if (tval >= tmin && tval <= tmax)
+    {
+        if (record) {
+            record->t = tval;
+            record->normal = makeUnitVector(n0 + beta * (n1 - n0) + gamma * (n2 - n0));
+            record->colour = colour;
+        }
+        return true;
+    }
+     
+     return false; 
+}
+
+/* Using the barycentric coordinates method from triangle::hit on every triangle on the mesh. */
 bool triangleMesh::hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const
 {
+
+    for (int i = 0; i < nt; i++) {
+        if (hitMeshTriangle(r, tmin, tmax, time, i, &record)) {
+            return true;
+        }
+    }
+
     return false;
 }
 
 bool triangleMesh::shadowHit(const ray &r, float tmin, float tmax, float time) const
 {
+    for (int i = 0; i < nt; i++) {
+        if (hitMeshTriangle(r, tmin, tmax, time, i, NULL)) {
+            return true;
+        }
+    }
+
     return false;
+}
+
+
+std::ostream &operator <<(std::ostream &out, const meshTriangle &t)
+{
+    out << "(i0 = " << t.i0 << " , i1 = " << t.i1 << " , i2 = " << t.i2 << ")";
+    return out;
+}
+
+std::ostream &operator <<(std::ostream &out, const meshVertex &v)
+{
+    out << "coords: " << v.coords << "   texCoords: " << v.texCoord << "   normal: " << v.normal << " ";
+    return out;
+}
+
+std::ostream &operator <<(std::ostream &out, const triangleMesh &tm)
+{
+    out << "nv: " << tm.nv << "\n" << "nt: " << tm.nt << "\n";
+
+    for(int i = 0; i < tm.nt; i++) {
+        out << tm.triangleArray[i] << "\n";
+        out << "i0 (vertex " << tm.triangleArray[i].i0 << ") " << tm.vertexArray[tm.triangleArray[i].i0] << "\n";
+        out << "i1 (vertex " << tm.triangleArray[i].i1 << ") " << tm.vertexArray[tm.triangleArray[i].i1] << "\n";
+        out << "i2 (vertex " << tm.triangleArray[i].i2 << ") " << tm.vertexArray[tm.triangleArray[i].i2] << "\n";
+        out << "\n";
+    }
+
+    return out;
 }
 
 /* ----- sphere ----- */ 
