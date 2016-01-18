@@ -13,6 +13,7 @@
 #include "sample.hpp"
 #include "camera.hpp"
 #include "light.hpp"
+#include "matrix.hpp"
 
 #define WIDTH 500
 #define HEIGHT 500
@@ -114,6 +115,12 @@ rgb trace(ray r, const std::vector<shape*> &shapes, const std::vector<pointLight
     }
 
     return colour;
+}
+
+void initLights(std::vector<pointLight*> &pointLights)
+{
+    pointLights.push_back(new pointLight());
+    pointLights.push_back( new pointLight( vec3(0, 200, -400), 5.0f, rgb(0.5, 0.5, 0.0f) )  );
 }
 
 int main(void)
