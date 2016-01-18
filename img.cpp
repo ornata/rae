@@ -60,11 +60,17 @@ void img::gammaCorrect(float g)
     }
 }
 
-void img::writePPM(std::ostream &out)
+void img::writePPM(std::string fname)
 {
     int i, j;
     uint32_t ired, igreen, iblue;
     uint8_t red, green, blue;
+
+    std::ofstream out(fname);
+    if (!(out.is_open())) {
+        std::cerr << "Error: Could not open '" << fname << "' for writing.\n";
+        exit(-1);
+    }
 
     // write header to output
     out << "P6\n";

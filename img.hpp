@@ -21,7 +21,7 @@ public:
 
     bool set(int x, int y, const rgb &colour);
     void gammaCorrect(float g);
-    void writePPM(std::ostream &out);
+    void writePPM(std::string fname);
 
 private:
     rgb** raster; // array of pixels
