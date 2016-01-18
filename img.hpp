@@ -16,18 +16,17 @@
 class img
 {
 public:
-    img(int w, int h); // ppm with width w, height h
+    img(int w, int h);         // ppm with width w, height h
     img(int w, int h, rgb bg); // ppm with background bg
 
     bool set(int x, int y, const rgb &colour);
     void gammaCorrect(float g);
     void writePPM(std::ostream &out);
-    void readPPM(std::string fname);
 
 private:
-    rgb** raster;
-    int nx;
-    int ny;
+    rgb** raster; // array of pixels
+    int nx;       // number of pixels (hort)
+    int ny;       // number of pixels (vert)
 };
 
 #endif

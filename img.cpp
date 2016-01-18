@@ -10,10 +10,10 @@ img::img(int w, int h)
 {
     nx = w;
     ny = h;
-    raster = new rgb*[nx];
+    raster = new rgb*[ny];
 
-    for (int i = 0; i < nx; i++) {
-        raster[i] = new rgb[ny];
+    for (int j = 0; j < ny; j++) {
+        raster[j] = new rgb[nx];
     }
 }
 
@@ -22,10 +22,10 @@ img::img(int w, int h, rgb bg)
     nx = w;
     ny = h;
 
-    for (int i = 0; i < nx; i++) {
-        raster[i] = new rgb[ny];
-        for (int j = 0; j < ny; j++) {
-            raster[i][j] = bg;
+    for (int j = 0; j < ny; j++) {
+        raster[j] = new rgb[nx];
+        for (int i = 0; i < nx; i++) {
+            raster[j][i] = bg;
         }
     }
 }
@@ -41,7 +41,7 @@ bool img::set(int x, int y, const rgb &colour)
         return false;
     }
 
-    raster[x][y] = colour;
+    raster[y][x] = colour;
     return true;
 }
 
@@ -50,10 +50,10 @@ void img::gammaCorrect(float g)
     rgb tmp;
     float power = 1.0 / g;
 
-    for (int i = 0; i < nx; i++) {
-        for (int j = 0; j < ny; j++) {
-            tmp = raster[i][j];
-            raster[i][j] = (rgb(pow(tmp.r, power)),
+    for (int j = 0; j < ny; j++) {
+        for (int i = 0; i < nx; i++) {
+            tmp = raster[j][i];
+            raster[j][i] = (rgb(pow(tmp.r, power)),
                             rgb(pow(tmp.g, power)),
                             rgb(pow(tmp.b, power)));
         }
@@ -72,8 +72,8 @@ void img::writePPM(std::ostream &out)
     out << "255\n";
     
     // output clamped to [0, 255]
-    for (i = ny-1; i >= 0; i--) {
-        for (j = 0; j < nx; j++) {
+    for (j = 0; j < ny; j++) {
+        for (i = 0; i < nx; i++) {
             ired = (uint32_t) (256 * raster[j][i].r);
             igreen = (uint32_t) (256 * raster[j][i].g);
             iblue = (uint32_t) (256 * raster[j][i].b);
@@ -89,53 +89,6 @@ void img::writePPM(std::ostream &out)
             out.put(red);
             out.put(green);
             out.put(blue);
-        }
-    }
-}
-
-void img::readPPM(std::string fname)
-{
-    std::ifstream in;
-    char ch, type;
-    char red, green, blue;
-    int i, j, cols, rows;
-    int num;
-
-    in.open(fname.c_str());
-
-    if (!in.is_open()) {
-        std::cerr << "ERROR: Could not open '" << fname << "'.\n";
-        exit(-1);
-    }
-
-    // read header
-    in.get(ch);
-    in.get(type);
-
-    in >> cols >> rows >> num;
-
-    nx = cols;
-    ny = rows;
-
-    // allocate raster for ppm
-    raster = new rgb*[nx];
-
-    for (i = 0; i < nx; i++) {
-        raster[i] =  new rgb[ny];
-    }
-
-    // clean up the newline
-    in.get(ch);
-
-    // store the ppm pixel values in the raster
-    for (i = ny-1; i >= 0; i--) {
-        for (j = 0; j < nx; j++) {
-            in.get(red);
-            in.get(green);
-            in.get(blue);
-            raster[j][i] = rgb((float) ((uint8_t)red)/255.0,
-                               (float) ((uint8_t)green)/255.0,
-                               (float) ((uint8_t)blue)/255.0);
         }
     }
 }
