@@ -19,9 +19,10 @@
 #define WIDTH 500
 #define HEIGHT 500
 #define SMALL_VAL 0.000001f
-#define NUM_SAMPLES 30
+#define NUM_SAMPLES 15
 #define BACKGROUND rgb(0.0, 0.0, 0.0)
 #define WHITE rgb(1.0, 1.0, 1.0)
+#define RED rgb(1.0, 0.0, 0.0)
 #define FAR 1000000.0
 #define AMBIENT rgb(0.3, 0.3, 0.3)
 #define MAX_BOUNCE 10
@@ -117,6 +118,24 @@ rgb trace(ray r, const std::vector<shape*> &shapes, const std::vector<pointLight
     return colour;
 }
 
+void initLights(std::vector<pointLight*> &pointLights)
+{
+    pointLights.push_back(new pointLight(vec3(200,300,-160), 4.0f));
+    pointLights.back()->colour = rgb(0, 157.0f/255.0f, 171.0f/255.0f);
+    pointLights.push_back(new pointLight(vec3(400,400,-130), 6.0f));
+    pointLights.back()->colour = rgb(0, 157.0f/255.0f, 171.0f/255.0f);
+    pointLights.push_back(new pointLight(vec3(100,130,-250), 2.0f));
+    pointLights.back()->colour = rgb(0, 157.0f/255.0f, 171.0f/255.0f);
+}
+
+void initShapes(std::vector<shape*> &shapes)
+{
+    shapes.push_back(new sphere (vec3(180,250,-150), 50.0f, rgb(0.7,0.1,0.7)));
+    shapes.push_back(new sphere (vec3(400,250,-200), 100.0f, rgb(0.9,0.1,0.7)));
+    shapes.push_back(new plane (vec3(0,60, 0), vec3(0,1,0), rgb(1,1,1)));
+    shapes.push_back(new sphere (vec3(300,100,-200), 60.0f, rgb(0.9,0.1,0.7)));
+    shapes.back()->mirror = true;
+}
 
 int main(void)
 {
@@ -129,22 +148,14 @@ int main(void)
     std::vector<pointLight*> pointLights;  // List of pointLights in the scene
     rgb background(0.0,0.0,0.0); // Background colour
 
-    vec3 eye(WIDTH/2, HEIGHT/2, 200); // camera location
+    vec3 eye(WIDTH/2, HEIGHT/2, 100); // camera location
 
-
-    // Popultate shapes to build the scene
-    shapes.push_back(new sphere (vec3(180,250,-150), 50.0f, rgb(0.7,0.1,0.7)));
-    shapes.push_back(new sphere (vec3(400,250,-200), 100.0f, rgb(0.9,0.1,0.7)));
-
-    pointLights.push_back(new pointLight(vec3(200,300,-200), 1.0f));
-    pointLights.push_back(new pointLight(vec3(400,400,-300), 1.0f));
-    pointLights.push_back(new pointLight(vec3(100,130,-250), 1.0f));
-
-    shapes.push_back(new plane (vec3(0,60, 0), vec3(0,1,0), rgb(1,1,1)));
-    shapes.push_back(new sphere (vec3(300,100,-200), 60.0f, rgb(0.9,0.1,0.7)));
-    shapes.back()->mirror = true;
+    //shapes.push_back(new triangleMesh("cube.mesh", RED));
+    initLights(pointLights);
+    initShapes(shapes);
 
     // Iterate over every pixel, firing off rays at objects
+    
     for (int j = 0; j < HEIGHT; j++) {
         for (int i = 0; i < WIDTH; i++) {
             rgb avgColour = background;
@@ -164,5 +175,6 @@ int main(void)
     }   
 
     // Output the image to a ppm file
-    image.writePPM(std::cout);
+    image.writePPM("out.ppm");
+    
 }
