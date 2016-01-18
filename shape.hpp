@@ -75,8 +75,8 @@ struct triangleMesh : public shape
 
     triangleMesh(std::string fname);
     ~triangleMesh();
-    virtual bool hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const=0;
-    virtual bool shadowHit(const ray &r, float tmin, float tmax, float time) const=0;
+    bool hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const;
+    bool shadowHit(const ray &r, float tmin, float tmax, float time) const;
 };
 
 /* sphere: defined by a centre and a radius */
