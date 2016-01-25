@@ -16,22 +16,37 @@
 #include <string>
 #include "ray.hpp"
 #include "vec.hpp"
+#include "matrix.hpp"
 
 /* hitRecord: stores information to do with ray-object intersections */
 struct hitRecord
 {
-    float t;     // param t in r = o + td for a ray r
-    vec3 normal; // normal to the surface defined by the intersection
+    float t;            // param t in r = o + td for a ray r
+    vec3 normal;        // normal to the surface defined by the intersection
     vec3 pointOnSurface;
-    rgb colour;  // colour of the point
+    rgb colour;         // colour of the point
 };
 
 /* shape: all shapes will be iterated over and checked for hit and shadowhit */
 struct shape
 {
     bool mirror = false;
+
     virtual bool hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const=0;
     virtual bool shadowHit(const ray &r, float tmin, float tmax, float time) const=0;
+};
+
+struct instance : shape
+{   
+    shape* s;                          // the actual shape we're looking at
+    tmat transform = identityMatrix();  // transformation to apply to the rays intersecting with the shape
+    tmat inverseTransform = identityMatrix();
+
+    instance(shape* s_);
+    instance(tmat transform_, tmat inverse_, shape* s_);
+    instance(tmat transform_, shape* s_);
+    bool hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const;
+    bool shadowHit(const ray &r, float tmin, float tmax, float time) const;
 };
 
 /* triangle: defined by three points */
@@ -91,6 +106,7 @@ struct sphere : shape
     rgb colour;  // colour of sphere
 
     sphere(const vec3 &centre_, float radius_, const rgb &colour_);
+    sphere(const vec3 &centre_, float radius_, const rgb &colour_, const tmat& transform_);
     bool hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const;
     bool shadowHit(const ray &r, float tmin, float tmax, float time) const;
 };

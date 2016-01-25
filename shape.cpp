@@ -6,6 +6,49 @@
 
 #include "shape.hpp"
 #define COLLISION_EPS 0.0001f
+
+/* ----- instance ----- */
+instance::instance(shape *s_) :
+s(s_)
+{}
+
+instance::instance(tmat transform_, tmat inverse_, shape* s_) :
+transform(transform_), inverseTransform(inverse_), s(s_)
+{}
+
+instance::instance(tmat transform_, shape* s_) :
+transform(transform_), s(s_)
+{
+    inverseTransform = inverse(transform);
+}
+
+/* Transform a ray into local coordinates, call hit for the shape, and then
+* transform the hit data back.
+*/
+bool instance::hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const
+{
+    //std::cout << "r: " << r << "\n";
+    //std::cout << "inverse:\n " << inverseTransform << "\n";
+    ray tr = inverseTransform * r; // note defn of tmat * ray in matrix.cpp
+    //std::cout << "tr: " << tr << "\n";
+
+    if (s->hit(tr, tmin, tmax, time, record)) {
+        record.pointOnSurface = transformPt(transform, record.pointOnSurface);
+        record.normal = makeUnitVector(vec3(transformVec(inverseTransform.transpose(), record.normal)));
+        return true;
+    }
+
+    return false;
+}
+
+bool instance::shadowHit(const ray &r, float tmin, float tmax, float time) const
+{
+    ray tr = inverseTransform * r;
+    return(s->shadowHit(tr, tmin, tmax, time));
+    return false;
+}
+
+
 /* ----- triangle ----- */ 
 
 triangle::triangle(const vec3 &p0_, const vec3 &p1_, const vec3& p2_, const rgb &colour_) :
@@ -289,25 +332,49 @@ bool triangleMesh::hitMeshTriangle(const ray &r, float tmin, float tmax, float t
 /* Using the barycentric coordinates method from triangle::hit on every triangle on the mesh. */
 bool triangleMesh::hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const
 {
-
+    hitRecord rtmp;
+    float min = 1000000.0f;
+    bool hitSomething = false;
     for (int i = 0; i < nt; i++) {
-        if (hitMeshTriangle(r, tmin, tmax, time, i, &record)) {
-            return true;
+        if (hitMeshTriangle(r, tmin, tmax, time, i, &rtmp) && rtmp.t < min) {
+            hitSomething = true;
+            record.t = rtmp.t;
+            min = rtmp.t;
+            record.normal = rtmp.normal;
+            record.pointOnSurface = rtmp.pointOnSurface;
+            record.colour = rtmp.colour;
         }
     }
 
-    return false;
+    if (hitSomething) {
+        return true;
+    }
+
+    else {
+        return false;
+    }
 }
 
 bool triangleMesh::shadowHit(const ray &r, float tmin, float tmax, float time) const
 {
+    hitRecord rtmp;
+    float min = 1000000.0f;
+    bool hitSomething = false;
+
     for (int i = 0; i < nt; i++) {
-        if (hitMeshTriangle(r, tmin, tmax, time, i, NULL)) {
-            return true;
+        if (hitMeshTriangle(r, tmin, tmax, time, i, &rtmp)) {
+            hitSomething = true;
+            min = rtmp.t;
         }
     }
 
-    return false;
+    if (hitSomething) {
+        return true;
+    }
+
+    else {
+        return false;
+    }
 }
 
 
