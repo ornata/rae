@@ -3,6 +3,7 @@
 #define MATRIX_H
 
 #include "vec.hpp"
+#include "ray.hpp"
 #include "onb.hpp"
 
 /* Transforms vectors into other vectors */
@@ -15,14 +16,19 @@ struct tmat {
     tmat operator *=(float s);
 
     float det() const;
+    void setToTranspose();
+    tmat transpose() const;
 };
 
 tmat operator +(tmat l, const tmat &r);
 tmat operator -(tmat l, const tmat &r);
 tmat operator *(tmat l, const tmat &r);
 vec3 operator *(const tmat &l, vec3 r);
+ray operator *(const tmat &l, ray r);
 tmat operator *(const tmat &l, float r);
 
+vec3 transformPt(const tmat &mat, vec3 v);
+vec3 transformVec(const tmat &mat, vec3 v);
 tmat identityMatrix();
 tmat zeroMatrix();
 tmat transpose(const tmat &mat);
@@ -34,6 +40,8 @@ tmat rotateY(float angle);
 tmat rotateZ(float angle);
 tmat rotate(const vec3 &axis, float angle);
 tmat viewMat(const vec3 &eye, const vec3 &gaze, const vec3 &up);
+tmat basisMatrix(const onb& o);
+
 
 std::ostream &operator <<(std::ostream &out, const tmat &mat);
 
@@ -42,7 +50,7 @@ inline float det3(float a, float b, float c,
            float d, float e, float f,
            float g, float h, float i) {
 
-    return(a*e*i + d*h*c + g*b*f - c*e*g - d*b*i - a*h*f);
+    return(a*e*i + d*h*c + g*b*f - g*e*c - d*b*i - a*h*f);
 
 }
 
