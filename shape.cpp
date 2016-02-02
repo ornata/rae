@@ -10,7 +10,8 @@
 /* ----- instance ----- */
 instance::instance(shape *s_) :
 s(s_)
-{}
+{
+}
 
 instance::instance(tmat transform_, tmat inverse_, shape* s_) :
 transform(transform_), inverseTransform(inverse_), s(s_)
@@ -192,6 +193,7 @@ std::ostream &operator <<(std::ostream &out, const triangle &toString)
 
 /* ----- triangleMesh ---- */
 
+
 /*
 * Read in a mesh file and initialize a triangleMesh using it.
 * 1st 4B of file: # vertices
@@ -199,9 +201,10 @@ std::ostream &operator <<(std::ostream &out, const triangle &toString)
 * Next # vertices * sizeof(meshVertex) B: vertex data
 * Next # triangles * sizeof(meshTriangle) B: triangle data
 */
-triangleMesh::triangleMesh(std::string fname, const rgb &colour_) :
+    triangleMesh::triangleMesh(std::string fname, const rgb &colour_) :
 colour(colour_)
 {
+    std::cout << "Loading mesh file '" << fname << "'...\n";
     FILE* meshFile = fopen(fname.c_str(), "rb");
     if (!meshFile) {
         std::cerr << "Could not open '" << fname << "'.\n";
@@ -244,6 +247,7 @@ colour(colour_)
     }
 
     fclose(meshFile);
+    std::cout << "Done loading '" << fname << "'.\n";
 }
 
 triangleMesh::~triangleMesh()
@@ -251,6 +255,7 @@ triangleMesh::~triangleMesh()
     free(vertexArray);
     free(triangleArray);
 }
+
 
 bool triangleMesh::hitMeshTriangle(const ray &r, float tmin, float tmax, float time, int tidx, hitRecord* record) const
 {
@@ -335,7 +340,9 @@ bool triangleMesh::hit(const ray &r, float tmin, float tmax, float time, hitReco
     hitRecord rtmp;
     float min = 1000000.0f;
     bool hitSomething = false;
+
     for (int i = 0; i < nt; i++) {
+
         if (hitMeshTriangle(r, tmin, tmax, time, i, &rtmp) && rtmp.t < min) {
             hitSomething = true;
             record.t = rtmp.t;
@@ -355,6 +362,10 @@ bool triangleMesh::hit(const ray &r, float tmin, float tmax, float time, hitReco
     }
 }
 
+/* Using the barycentric coordinates method from triangle::hit on every triangle on the mesh.
+* As in other shadowHit methods, this does not set colour etc, but does keep track of
+* t.
+*/
 bool triangleMesh::shadowHit(const ray &r, float tmin, float tmax, float time) const
 {
     hitRecord rtmp;

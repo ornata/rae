@@ -4,7 +4,6 @@
 
 #include "vec.hpp"
 #include "ray.hpp"
-#include "onb.hpp"
 
 /* Transforms vectors into other vectors */
 struct tmat {
@@ -40,8 +39,6 @@ tmat rotateY(float angle);
 tmat rotateZ(float angle);
 tmat rotate(const vec3 &axis, float angle);
 tmat viewMat(const vec3 &eye, const vec3 &gaze, const vec3 &up);
-tmat basisMatrix(const onb& o);
-
 
 std::ostream &operator <<(std::ostream &out, const tmat &mat);
 

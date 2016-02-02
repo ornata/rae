@@ -407,26 +407,6 @@ tmat viewMat(const vec3 &eye, const vec3 &gaze, const vec3 &up)
     return mat;
 }
 
-tmat basisMatrix(const onb &o)
-{
-    tmat mat = zeroMatrix();
-    vec3 u = o.u;
-    vec3 v = o.v;
-    vec3 w = o.w;
-
-    mat.m[0][0] = u.x;
-    mat.m[0][1] = u.y;
-    mat.m[0][2] = u.z;
-    mat.m[1][0] = v.x;
-    mat.m[1][1] = v.y;
-    mat.m[1][2] = v.z;
-    mat.m[2][0] = w.x;
-    mat.m[2][1] = w.y;
-    mat.m[2][2] = w.z;
-    mat.m[3][3] = 1;
-
-    return mat;
-}
 
 std::ostream &operator <<(std::ostream &out, const tmat &mat)
 {

@@ -353,7 +353,7 @@ vec3 cross(const vec3 &v1, const vec3 &v2)
 /* Return the length of a 3D vector */
 float length(const vec3 &v)
 {
-    return sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+    return sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
 }
 
 /* Return a vector of length 1 in the direction of v */
@@ -364,12 +364,12 @@ vec3 makeUnitVector(vec3 v)
 
 float lengthSquared(vec3 v)
 {
-    return v.x * v.x + v.y * v.y + v.z * v.z;
+    return v.x*v.x + v.y*v.y + v.z*v.z;
 }
 
 float dot(const vec3 &v1, const vec3 &v2)
 {
-    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+    return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z;
 }
 
 float tripleProduct(const vec3 &v1, const vec3 &v2, const vec3 &v3)

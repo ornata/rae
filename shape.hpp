@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <string>
+#include <algorithm>
 #include "ray.hpp"
 #include "vec.hpp"
 #include "matrix.hpp"
@@ -21,10 +22,10 @@
 /* hitRecord: stores information to do with ray-object intersections */
 struct hitRecord
 {
-    float t;            // param t in r = o + td for a ray r
-    vec3 normal;        // normal to the surface defined by the intersection
-    vec3 pointOnSurface;
-    rgb colour;         // colour of the point
+    float t;              // param t in r = o + td for a ray r
+    vec3 normal;          // normal to the surface defined by the intersection
+    vec3 pointOnSurface;  // point the ray hit
+    rgb colour;           // colour of the point
 };
 
 /* shape: all shapes will be iterated over and checked for hit and shadowhit */
@@ -38,12 +39,13 @@ struct shape
 
 struct instance : shape
 {   
-    shape* s;                          // the actual shape we're looking at
+    shape* s;                           // the actual shape we're looking at
     tmat transform = identityMatrix();  // transformation to apply to the rays intersecting with the shape
     tmat inverseTransform = identityMatrix();
 
     instance(shape* s_);
     instance(tmat transform_, tmat inverse_, shape* s_);
+    instance(tmat transform_, tmat inverse_, shape* s_, rgb colour_);
     instance(tmat transform_, shape* s_);
     bool hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const;
     bool shadowHit(const ray &r, float tmin, float tmax, float time) const;
@@ -52,9 +54,9 @@ struct instance : shape
 /* triangle: defined by three points */
 struct triangle : public shape
 {
-    vec3 p0; // left point
-    vec3 p1; // top point
-    vec3 p2; // right point
+    vec3 p0;    // left point
+    vec3 p1;    // top point
+    vec3 p2;    // right point
     rgb colour;
 
     triangle(const vec3 &p0_, const vec3 &p1_, const vec3& p2_, const rgb &colour_);
@@ -66,9 +68,9 @@ struct triangle : public shape
 * A vertex read from a .mesh file.
 */
 struct meshVertex {
-    vec3 coords;     // Position of the vertex 
-    vec2 texCoord;   // Map for the texture components
-    vec3 normal;      // Normal of the vertex
+    vec3 coords;    // Position of the vertex 
+    vec2 texCoord;  // Map for the texture components
+    vec3 normal;    // Normal of the vertex
 };
 
 /*
@@ -81,6 +83,7 @@ struct meshTriangle {
     uint32_t i2; // ID of third vertex in vertexArray
 };
 
+/* triangleMesh stored openGL style */
 struct triangleMesh : public shape
 {
     uint32_t nv;                  // number of vertices
@@ -101,9 +104,9 @@ struct triangleMesh : public shape
 /* sphere: defined by a centre and a radius */
 struct sphere : shape
 {
-    vec3 centre; // centre of sphere
+    vec3 centre;  // centre of sphere
     float radius; // radius of sphere
-    rgb colour;  // colour of sphere
+    rgb colour;   // colour of sphere
 
     sphere(const vec3 &centre_, float radius_, const rgb &colour_);
     sphere(const vec3 &centre_, float radius_, const rgb &colour_, const tmat& transform_);
@@ -114,14 +117,15 @@ struct sphere : shape
 /* plane: defined by a point + a normal */
 struct plane : shape
 {
-    vec3 pt; // point on the plane
-    vec3 n;  // vector normal to the plane
+    vec3 pt;    // point on the plane
+    vec3 n;     // vector normal to the plane
     rgb colour; // colour of plane
 
     plane(const vec3 &pt_, const vec3 &n_, const vec3 &colour_);
     bool hit(const ray &r, float tmin, float tmax, float time, hitRecord &record) const;
     bool shadowHit(const ray &r, float tmin, float tmax, float time) const;
 };
+
 
 std::ostream &operator <<(std::ostream &out, const triangle &toString);
 std::ostream &operator <<(std::ostream &out, const sphere &toString);

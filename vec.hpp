@@ -132,6 +132,7 @@ vec2 clamp(vec2 v, vec2 minVal, vec2 maxVal);
 vec2 mix(vec2 v1, vec2 v2, vec2 a);
 vec2 makeUnitVector();
 
+// might need these eventually? just copying the opengl api
 float clamp(float x, float minVal, float maxVal);
 float mix(float x, float y, float a);
 
